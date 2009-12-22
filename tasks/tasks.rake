@@ -2,7 +2,13 @@ namespace :db2s3 do
   namespace :backup do
     desc "Save a full back to S3"
     task :full => :environment do
-      DB2S3.new.full_backup
+      unless ENV['mysqldump_path'].nil?
+        puts "#{ENV['mysqldump_path']}"
+        DB2S3.new.full_backup(ENV['mysqldump_path'])
+      else
+        DB2S3.new.full_backup
+      end
+      #DB2S3.new.full_backup
     end
 
     desc "Restore your DB from S3"

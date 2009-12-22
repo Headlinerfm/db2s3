@@ -9,9 +9,13 @@ class DB2S3
   def initialize
   end
 
-  def full_backup
+  def full_backup(mysqldump_path = nil)
     file_name = "dump-#{db_credentials[:database]}-#{Time.now.utc.strftime("%Y%m%d%H%M")}.sql.gz"
-    store.store(file_name, open(dump_db.path))
+    unless mysqldump_path.nil?
+      store.store(file_name, open(dump_db(mysqldump_path).path))
+    else
+      store.store(file_name, open(dump_db.path))
+    end
     store.store(most_recent_dump_file_name, file_name)
   end
 
@@ -73,11 +77,16 @@ class DB2S3
 
   private
 
-  def dump_db
+  def dump_db(mysqldump_path = nil)
     dump_file = Tempfile.new("dump")
 
     #cmd = "mysqldump --quick --single-transaction --create-options -u#{db_credentials[:user]} --flush-logs --master-data=2 --delete-master-logs"
-    cmd = "mysqldump --quick --single-transaction --create-options #{mysql_options}"
+    #cmd = "mysqldump --quick --single-transaction --create-options #{mysql_options}"
+    unless mysqldump_path.nil?
+      cmd = "#{mysqldump_path} --quick --single-transaction --create-options #{mysql_options}"
+    else
+      cmd = "mysqldump --quick --single-transaction --create-options #{mysql_options}"
+    end
     cmd += " | gzip > #{dump_file.path}"
     run(cmd)
 

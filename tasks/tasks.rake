@@ -5,6 +5,11 @@ namespace :db2s3 do
       DB2S3.new.full_backup
     end
 
+    desc "Save an incremental backup to S3"
+    task :incremental => :environment do
+      DB2S3.new.incremental_backup
+    end
+
     desc "Restore your DB from S3"
     task :restore => :environment do
       DB2S3.new.restore

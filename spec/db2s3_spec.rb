@@ -23,4 +23,19 @@ describe 'db2s3' do
       Person.find_by_name("Baxter").should_not be_nil
     end
   end
+  
+  if DB2S3::Config::Backup_Options[:backup_binlog]
+     it 'can save and restore a backup to and from S3 with incremental backups' do
+       db2s3 = DB2S3.new
+       load_schema
+       Person.create!(:name => "Baxter")
+       db2s3.full_backup
+       sleep(10)
+       Person.create!(:name => "Nimrod")
+       db2s3.incremental_backup
+       drop_schema
+       db2s3.restore
+       Person.find_by_name("Nimrod").should_not be_nil
+     end
+   end
 end

@@ -3,6 +3,7 @@ require 'aws/s3'
 require 'tempfile'
 require 'lockfile'
 require 'tmpdir'
+require 'pp'
 
 class DB2S3
   class Config
@@ -35,6 +36,7 @@ class DB2S3
          Lockfile.new('db2s3_backup.lock', :retries => 0) do
              execute_sql "flush logs"
              logs = Dir.glob("#{binlog_path}mysql-bin.[0-9]*").sort
+             last_log=logs[-1]
              logs_to_archive = logs[0..-2] # all logs except the last
              logs_to_archive.each do |log|
                # The following executes once for each filename in logs_to_archive
@@ -43,7 +45,8 @@ class DB2S3
                store.store(log_name, open(log))   
              end
              store.store(most_recent_incremental_dump_file_name, "#{Time.now.utc}")
-             execute_sql "purge master logs to '#{File.basename(logs[-1])}'"
+             pp File.basename(last_log)
+             execute_sql "purge binary logs to '#{File.basename(last_log)}'"
          end
       rescue Lockfile::MaxTriesLockError => e
          raise("error, another backup is in progress, exiting.")
@@ -187,7 +190,9 @@ class DB2S3
   
   def execute_sql(sql)
     cmd = ''
-    cmd += "mysql -e '#{sql}' " 
+    cmd += 'mysql -e "' # so hackety
+    cmd += "#{sql}"
+    cmd += '"'    
     cmd += mysql_options
     run(cmd)
   end

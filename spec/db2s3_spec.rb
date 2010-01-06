@@ -24,7 +24,7 @@ describe 'db2s3' do
     end
   end
   
-  if DB2S3::Config::Backup_Options[:backup_binlog]
+  if DB2S3::Config::S3[:backup_binlog]
      it 'can save and restore a backup to and from S3 with incremental backups' do
        db2s3 = DB2S3.new
        load_schema

@@ -8,6 +8,11 @@ use on a Mysql Master DB in a replicated environment.
 but you're replicating, so you probably don't really need it.
 You could, however, use it to backup your Mysql Slave server.
 
+# using OSX and mysql from macports and want to test incremental backups? 
+# start mysql with this command:
+# /opt/local/share/mysql5/mysql/mysql.server start --log-bin=mysql-bin
+# and the binlog_path='/opt/local/var/db/mysql5/'
+
 
 Usage:
   # In config/environment.rb

@@ -59,7 +59,7 @@ class DB2S3
         dump_file_name = store.fetch(most_recent_dump_file_name).read
         file = store.fetch(dump_file_name)
         run "gunzip -c #{file.path} | mysql #{mysql_options}"
-        if DB2S3::Config::Backup_Options[:backup_binlog] == true
+        if DB2S3::Config::S3[:backup_binlog] == true
           incremental_restore
         end
       end
@@ -217,16 +217,16 @@ class DB2S3
   end
   
   def binlog_configured
-    unless DB2S3::Config::Backup_Options[:incremental_backup]
+    unless DB2S3::Config::S3[:incremental_backup]
       return false
     else 
-      return DB2S3::Config::Backup_Options[:incremental_backup] 
+      return DB2S3::Config::S3[:incremental_backup] 
     end
   end
   
   def binlog_path
     if binlog_configured
-      return DB2S3::Config::Backup_Options[:binlog_path] 
+      return DB2S3::Config::S3[:binlog_path] 
     else
       raise("binlog backup has not been enabled. Please specify binlog_path")
       return false

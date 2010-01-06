@@ -39,7 +39,7 @@ class DB2S3
                log_name="incremental-#{db_credentials[:database]}-"+file_name+"-#{Time.now.utc.strftime("%Y%m%d%H%M")}.log"
                store.store(log_name, open(log))   
              end
-             store.store(most_recent_inc_dump_file_name, "#{Time.now.utc}")
+             store.store(most_recent_incremental_dump_file_name, "#{Time.now.utc}")
              execute_sql "purge master logs to '#{File.basename(logs[-1])}'"
          end
       rescue Lockfile::MaxTriesLockError => e

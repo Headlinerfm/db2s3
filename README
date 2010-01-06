@@ -3,6 +3,12 @@ DB2S3 - A rails plugin to backup Mysql to Amazon S3
 You're looking at a monthly spend of four cents
 So pony up you cheap bastard, and store your backups on S3
 
+WARNING: incremental backups are emphatically not safe for
+use on a Mysql Master DB in a replicated environment.
+but you're replicating, so you probably don't really need it.
+You could, however, use it to backup your Mysql Slave server.
+
+
 Usage:
   # In config/environment.rb
   config.gem "db2s3", :source => "http://gemcutter.org"
@@ -13,10 +19,12 @@ Usage:
   # In config/initializers/db2s3.rb
   DB2S3::Config.instance_eval do
     S3 = {
-      :access_key_id     => 'yourkey',
-      :secret_access_key => 'yoursecretkey',
-      :bucket            => 'yourapp-db-backup'
-    }
+      :access_key_id      => 'yourkey',
+      :secret_access_key  => 'yoursecretkey',
+      :bucket             => 'yourapp-db-backup',
+      :incremental_backup => 'true', #defaults to false
+      :binlog_path        => '/path/to/binlog/' # required, if above is true
+    }                                       #required trailing slash
   end
   # DB credentials are read from your rails environment
 
@@ -24,7 +32,7 @@ Usage:
 
   # Add to your crontab or whatever
   rake db2s3:backup:full
-  rake db2s3:backup:incremental # Unimplemented
+  rake db2s3:backup:incremental
 
   # Handy tasks
   rake db2s3:statistics      # Shows you the size of your DB

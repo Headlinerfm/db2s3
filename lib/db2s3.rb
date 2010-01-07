@@ -1,4 +1,4 @@
-require 'activesupport'
+require 'active_support'
 require 'aws/s3'
 require 'tempfile'
 require 'lockfile'

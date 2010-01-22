@@ -24,8 +24,8 @@ class DB2S3
         if binlog_path
           delete_all_binlogs #otherwise restore will use old data in binlogs
         end
+        store.store(most_recent_dump_file_name,file_name)
       end
-      store.store(most_recent_dump_file_name,file_name)
     rescue Lockfile::MaxTriesLockError => e
       raise("error, another backup is in progress, exiting.")
     end
